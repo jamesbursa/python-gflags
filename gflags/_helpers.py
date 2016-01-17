@@ -121,8 +121,7 @@ def GetCallingModuleObjectAndName():
   Raises:
     AssertionError: if no calling module could be identified.
   """
-  range_func = range if sys.version_info[0] >= 3 else xrange
-  for depth in range_func(1, sys.getrecursionlimit()):
+  for depth in range(1, sys.getrecursionlimit()):
     # sys._getframe is the right thing to use here, as it's the best
     # way to walk up the call stack.
     globals_for_frame = sys._getframe(depth).f_globals  # pylint: disable=protected-access
@@ -357,7 +356,7 @@ def FlagDictToArgs(flag_map):
   Yields:
     sequence of string suitable for a subprocess execution.
   """
-  for key, value in flag_map.iteritems():
+  for key, value in iter(flag_map.items()):
     if value is None:
       yield '--%s' % key
     elif isinstance(value, bool):
