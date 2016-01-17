@@ -1,5 +1,17 @@
 #!/usr/bin/env python
+import struct
+import sys
 import unittest
+
+try:
+  import fcntl  # pylint: disable=g-import-not-at-top
+except ImportError:
+  fcntl = None
+try:
+  # Importing termios will fail on non-unix platforms.
+  import termios  # pylint: disable=g-import-not-at-top
+except ImportError:
+  termios = None
 
 import gflags
 from gflags import _helpers
@@ -9,6 +21,25 @@ FLAGS = gflags.FLAGS
 
 class FlagsUnitTest(unittest.TestCase):
   """Flags formatting Unit Test."""
+
+  def setUp(self):
+    """Set up before running a test."""
+    self._winsize_data = None
+    if fcntl and termios:
+      # The tests rely on the terminal width so we need to set it to
+      # a value smaller than the minimum help width used in the tests.
+      winsize_data = struct.pack('HHHH', 0, 0, 0, 0)
+      self._winsize_data = fcntl.ioctl(
+          sys.stdout, termios.TIOCGWINSZ, winsize_data)
+      winsize = struct.unpack('HHHH', self._winsize_data)
+      winsize_data = struct.pack(
+          'HHHH', winsize[0], 0, winsize[2], winsize[3])
+      fcntl.ioctl(sys.stdout, termios.TIOCSWINSZ, winsize_data)
+
+  def tearDown(self):
+    """Clean up after running a test."""
+    if fcntl and termios and self._winsize_data:
+      fcntl.ioctl(sys.stdout, termios.TIOCSWINSZ, self._winsize_data)
 
   def testGetHelpWidth(self):
     """Verify that GetHelpWidth() reflects _help_width."""

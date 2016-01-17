@@ -188,7 +188,7 @@ def GetHelpWidth():
     return _DEFAULT_HELP_WIDTH
   try:
     data = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, '1234')
-    columns = struct.unpack('hh', data)[1]
+    columns = struct.unpack('HH', data)[1]
     # Emacs mode returns 0.
     # Here we assume that any value below 40 is unreasonable.
     if columns >= _MIN_HELP_WIDTH:
