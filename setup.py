@@ -38,7 +38,7 @@ setup(name='python-gflags',
       author='Google Inc. and others',
       author_email='google-gflags@googlegroups.com',
       url='https://github.com/google/python-gflags',
-      py_modules=['gflags'],
+      packages=['gflags', 'gflags/third_party/pep257'],
       data_files=[('bin', ['gflags2man.py'])],
       include_package_data=True,
      )
